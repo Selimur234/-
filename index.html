@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সিকান্দার ভিলা - মেস ম্যানেজমেন্ট সিস্টেম</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .mess-title {
+            color: #d35400;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .card {
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 5px solid #3498db;
+        }
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .card span {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .form-section {
+            background: #f9fbfd;
+            padding: 15px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            font-size: 14px;
+            width: auto;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fbfd;
+        }
+        .link-btn {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        .back-btn {
+            background-color: #e74c3c;
+            margin-bottom: 15px;
+            width: auto;
+            padding: 8px 15px;
+        }
+        .back-btn:hover {
+            background-color: #c0392b;
+        }
+        .logout-btn {
+            background-color: #e67e22;
+            margin-bottom: 15px;
+            width: auto;
+            padding: 8px 15px;
+            float: right;
+        }
+        .logout-btn:hover {
+            background-color: #d35400;
+        }
+        .nav-btn {
+            background-color: #27ae60;
+            margin-bottom: 20px;
+            width: auto;
+            padding: 10px 20px;
+            display: inline-block;
+        }
+        .nav-btn:hover {
+            background-color: #219653;
+        }
+        .hidden {
+            display: none;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline;
+            cursor: pointer;
+        }
+
+        /* লগইন পেজ ডিজাইন */
+        #loginPage {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        /* ফুটার ডিজাইন */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* অ্যানিমেশন টোস্ট নোটিফিকেশন */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #2ecc71;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            padding: 12px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: -50px;
+            transform: translateX(-50%);
+            font-size: 16px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.5s ease-in-out;
+        }
+        #toast.show {
+            visibility: visible;
+            bottom: 30px;
+        }
+        #toast.delete-toast {
+            background-color: #e74c3c;
+        }
+
+        /* কাস্টম অ্যানিমেটেড ডিলিট কনফার্মেশন মডাল */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        .modal-buttons button {
+            width: 45%;
+        }
+        .btn-yes { background-color: #e74c3c; }
+        .btn-yes:hover { background-color: #c0392b; }
+        .btn-no { background-color: #95a5a6; }
+        .btn-no:hover { background-color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<!-- ১. লগইন পেজ -->
+<div id="loginPage">
+    <h1 class="mess-title">🏠 সিকান্দার ভিলা</h1>
+    <h2>মেস লগইন</h2>
+    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">প্রবেশ করতে আপনার পাসওয়ার্ড দিন</p>
+    <div class="form-group">
+        <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড লিখুন">
+    </div>
+    <button onclick="checkLogin()">লগইন করুন</button>
+</div>
+
+<div class="container hidden" id="mainContainer">
+
+    <!-- হোম পেজ / ড্যাশবোর্ড -->
+    <div id="homePage">
+        <button class="logout-btn" onclick="logout()">লগআউট</button>
+        <h1 class="mess-title">🏠 সিকান্দার ভিলা</h1>
+        <h2>মেস ম্যানেজমেন্ট ড্যাশবোর্ড</h2>
+
+        <div style="text-align: center;">
+            <button class="nav-btn" onclick="openMarketPage()">🛒 আলাদা বাজার খরচের ফাইল দেখুন</button>
+        </div>
+
+        <!-- সামারি কার্ড -->
+        <div class="summary-grid">
+            <div class="card">
+                <h3>মোট জমা (Income)</h3>
+                <span id="totalDeposit">0</span> টাকা
+            </div>
+            <div class="card">
+                <h3>মোট বাজার খরচ (Expense)</h3>
+                <span id="totalCost">0</span> টাকা
+            </div>
+            <div class="card">
+                <h3>মোট মিল সংখ্যা</h3>
+                <span id="totalMeals">0</span> টি
+            </div>
+            <div class="card" style="border-left-color: #e74c3c;">
+                <h3>মোট মিলের খরচ</h3>
+                <span id="totalMealCostSummary">0</span> টাকা
+            </div>
+        </div>
+
+        <!-- ১. বোর্ডার যোগ ও ডিলিট সেকশন -->
+        <div class="form-section">
+            <h2>১. নতুন বোর্ডার যোগ করুন</h2>
+            <div class="form-group">
+                <label for="newBoarderName">বর্ডারের নাম:</label>
+                <input type="text" id="newBoarderName" placeholder="নাম লিখে সেভ করুন">
+            </div>
+            <button onclick="addBoarder()">বোর্ডার সেভ করুন</button>
+        </div>
+
+        <!-- ২. টাকা জমা নেওয়ার ফর্ম -->
+        <div class="form-section">
+            <h2>২. টাকা জমা নিন (Deposit)</h2>
+            <div class="form-group">
+                <label for="depositBoarderSelect">বোর্ডার নির্বাচন করুন:</label>
+                <select id="depositBoarderSelect">
+                    <option value="">--বোর্ডার বেছে নিন--</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="depositAmount">টাকার পরিমাণ:</label>
+                <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ">
+            </div>
+            <button onclick="addDeposit()">টাকা জমা করুন</button>
+        </div>
+
+        <!-- ৩. তারিখসহ প্রতিদিনের মিল এন্ট্রি ফর্ম -->
+        <div class="form-section">
+            <h2>৩. মিল এন্ট্রি (সকাল: ৫টাকা, দুপুর: ১৫টাকা, রাত: ১০টাকা)</h2>
+            <div class="form-group">
+                <label for="mealDate">তারিখ (লিখে দিন):</label>
+                <input type="text" id="mealDate" placeholder="যেমন: ১ মার্চ বা 01/03/2026">
+            </div>
+            <div class="form-group">
+                <label for="mealBoarderSelect">বোর্ডার নির্বাচন করুন:</label>
+                <select id="mealBoarderSelect">
+                    <option value="">--বোর্ডার বেছে নিন--</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>কোন কোন বেলা মিল খেয়েছে?</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="breakfastCheck"> সকাল (৫ টাকা)</label>
+                    <label><input type="checkbox" id="lunchCheck"> দুপুর (১৫ টাকা)</label>
+                    <label><input type="checkbox" id="dinnerCheck"> রাত (১০ টাকা)</label>
+                </div>
+            </div>
+            <button onclick="addDailyMeal()">মিল যোগ করুন</button>
+        </div>
+
+        <!-- বোর্ডারদের তালিকা টেবিল -->
+        <h2>সেভ করা বোর্ডারদের তালিকা</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>বর্ডারের নাম</th>
+                    <th>মোট জমা (টাকা)</th>
+                    <th>মোট মিল</th>
+                    <th>ব্যক্তিগত ফাইল</th>
+                    <th>অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="boarderTableBody">
+                <!-- ডায়নামিক ডাটা এখানে আসবে -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- বাজার খরচের আলাদা পেজ -->
+    <div id="marketPage" class="hidden">
+        <button class="back-btn" onclick="goHome()">← ড্যাশবোর্ডে ফিরে যান</button>
+        <h1 class="mess-title">🏠 সিকান্দার ভিলা</h1>
+        <h2>বাজার খরচের হিসাব ফাইল</h2>
+
+        <div class="form-section">
+            <h3>নতুন বাজার খরচ যোগ করুন</h3>
+            <div class="form-group">
+                <label for="marketDate">তারিখ (লিখে দিন):</label>
+                <input type="text" id="marketDate" placeholder="যেমন: ১ মার্চ বা 01/03/2026">
+            </div>
+            <div class="form-group">
+                <label for="marketDesc">বাজারের বিবরণ (কী বাজার করা হয়েছে):</label>
+                <input type="text" id="marketDesc" placeholder="যেমন: চাল, ডাল, মাছ ও সবজি">
+            </div>
+            <div class="form-group">
+                <label for="marketCostInput">বাজার খরচের পরিমাণ (টাকা):</label>
+                <input type="number" id="marketCostInput" placeholder="টাকার পরিমাণ">
+            </div>
+            <button onclick="addMarketCost()">বাজার খরচ সেভ করুন</button>
+        </div>
+
+        <h3>বাজার খরচের তালিকা</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>তারিখ</th>
+                    <th>বিবরণ</th>
+                    <th>খরচ (টাকা)</th>
+                    <th>অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="marketHistoryBody">
+                <!-- বাজারের ইতিহাস এখানে দেখাবে -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- বর্ডারের ব্যক্তিগত পেজ (ডিটেইলস ভিউ) -->
+    <div id="detailPage" class="hidden">
+        <button class="back-btn" onclick="goHome()">← ড্যাশবোর্ডে ফিরে যান</button>
+        <h1 class="mess-title">🏠 সিকান্দার ভিলা</h1>
+        <h2 id="detailTitle">বর্ডারের নাম</h2>
+        
+        <div class="summary-grid">
+            <div class="card">
+                <h3>মোট জমা</h3>
+                <span id="detailDeposit">0</span> টাকা
+            </div>
+            <div class="card">
+                <h3>মোট মিল</h3>
+                <span id="detailMeals">0</span> টি
+            </div>
+            <div class="card">
+                <h3>মিলের খরচ</h3>
+                <span id="detailMealCost">0</span> টাকা
+            </div>
+            <div class="card" style="border-left-color: #27ae60;">
+                <h3>অবস্থা (পাওনা / দিতে হবে)</h3>
+                <span id="detailBalance">0</span> টাকা
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>মিলের বিস্তারিত ইতিহাস</h3>
+            <table id="mealHistoryTable">
+                <thead>
+                    <tr>
+                        <th>তারিখ</th>
+                        <th>সকাল (৫টাকা)</th>
+                        <th>দুপুর (১৫টাকা)</th>
+                        <th>রাত (১০টাকা)</th>
+                        <th>মোট খরচ</th>
+                    </tr>
+                </thead>
+                <tbody id="mealHistoryBody">
+                    <!-- মিলের ইতিহাস এখানে দেখাবে -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ফুটার -->
+<footer>
+    Created by Selim
+</footer>
+
+<!-- অ্যানিমেশন টোস্ট নোটিফিকেশন -->
+<div id="toast">সফলভাবে সেভ হয়েছে!</div>
+
+<!-- অ্যানিমেটেড কাস্টম ডিলিট কনফার্মেশন মডাল -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>নিশ্চিত করুন</h3>
+        <p>আপনি কি সত্যিই এটি ডিলিট করতে চান?</p>
+        <div class="modal-buttons">
+            <button class="btn-yes" id="modalYesBtn">হ্যাঁ</button>
+            <button class="btn-no" onclick="closeModal()">না</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let boarders = [];
+    let marketCosts = []; 
+    const CORRECT_PASSWORD = "admin1234"; // এখানে আপনার পাসওয়ার্ড সেট করা আছে
+
+    function checkLogin() {
+        let pass = document.getElementById('loginPassword').value;
+        if (pass === CORRECT_PASSWORD) {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainContainer').classList.remove('hidden');
+            showToast("লগইন সফল হয়েছে!");
+        } else {
+            showToast("আপনার পাসওয়ার্ড ভুল হয়েছে, দয়া করে আবার চেষ্টা করুন।", true);
+            document.getElementById('loginPassword').value = '';
+        }
+    }
+
+    function logout() {
+        document.getElementById('mainContainer').classList.add('hidden');
+        document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('loginPassword').value = '';
+        showToast("লগআউট করা হয়েছে!", true);
+    }
+
+    let todayStr = "আজ";
+    document.getElementById('mealDate').value = todayStr;
+    document.getElementById('marketDate').value = todayStr;
+
+    function showToast(message, isError = false) {
+        let toast = document.getElementById('toast');
+        toast.innerText = message;
+        if (isError) {
+            toast.className = "show delete-toast";
+        } else {
+            toast.className = "show";
+        }
+        setTimeout(() => { toast.className = ""; }, 3000);
+    }
+
+    let deleteCallback = null;
+    function openModal(callback) {
+        deleteCallback = callback;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+    function closeModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+        deleteCallback = null;
+    }
+    document.getElementById('modalYesBtn').onclick = function() {
+        if (deleteCallback) deleteCallback();
+        closeModal();
+    };
+
+    function addBoarder() {
+        let name = document.getElementById('newBoarderName').value.trim();
+        if (!name) {
+            alert("দয়া করে বর্ডারের নাম লিখুন!");
+            return;
+        }
+        
+        let exists = boarders.some(b => b.name === name);
+        if (exists) {
+            alert("এই নামের বোর্ডার আগেই সেভ করা আছে!");
+            return;
+        }
+
+        boarders.push({
+            name: name,
+            deposit: 0,
+            meals: [] 
+        });
+
+        document.getElementById('newBoarderName').value = '';
+        updateUI();
+        showToast("বোর্ডার সফলভাবে সেভ হয়েছে!");
+    }
+
+    function deleteBoarder(index) {
+        openModal(() => {
+            boarders.splice(index, 1);
+            updateUI();
+            showToast("বোর্ডার সফলভাবে ডিলিট করা হয়েছে!", true);
+        });
+    }
+
+    function addDeposit() {
+        let name = document.getElementById('depositBoarderSelect').value;
+        let amount = parseFloat(document.getElementById('depositAmount').value) || 0;
+
+        if (!name || amount <= 0) {
+            alert("সঠিক বোর্ডার সিলেক্ট করুন এবং টাকার পরিমাণ দিন!");
+            return;
+        }
+
+        let boarder = boarders.find(b => b.name === name);
+        if (boarder) {
+            boarder.deposit += amount;
+            document.getElementById('depositAmount').value = '';
+            updateUI();
+            showToast("টাকা জমা সফল হয়েছে!");
+        }
+    }
+
+    function addDailyMeal() {
+        let date = document.getElementById('mealDate').value.trim() || "তারিখ বিহীন";
+        let name = document.getElementById('mealBoarderSelect').value;
+
+        if (!name) {
+            alert("বোর্ডার সিলেক্ট করুন!");
+            return;
+        }
+
+        let isBreakfast = document.getElementById('breakfastCheck').checked ? 1 : 0;
+        let isLunch = document.getElementById('lunchCheck').checked ? 1 : 0;
+        let isDinner = document.getElementById('dinnerCheck').checked ? 1 : 0;
+
+        if (isBreakfast === 0 && isLunch === 0 && isDinner === 0) {
+            alert("কমপক্ষে একটি বেলা সিলেক্ট করুন!");
+            return;
+        }
+
+        let boarder = boarders.find(b => b.name === name);
+        if (boarder) {
+            let existingDayMeal = boarder.meals.find(m => m.date === date);
+            if (existingDayMeal) {
+                existingDayMeal.breakfast += isBreakfast;
+                existingDayMeal.lunch += isLunch;
+                existingDayMeal.dinner += isDinner;
+            } else {
+                boarder.meals.push({
+                    date: date,
+                    breakfast: isBreakfast,
+                    lunch: isLunch,
+                    dinner: isDinner
+                });
+            }
+
+            document.getElementById('breakfastCheck').checked = false;
+            document.getElementById('lunchCheck').checked = false;
+            document.getElementById('dinnerCheck').checked = false;
+
+            updateUI();
+            showToast("মিলের হিসাব সফলভাবে যোগ হয়েছে!");
+        }
+    }
+
+    function addMarketCost() {
+        let date = document.getElementById('marketDate').value.trim() || "তারিখ বিহীন";
+        let desc = document.getElementById('marketDesc').value.trim() || "সাধারণ বাজার";
+        let cost = parseFloat(document.getElementById('marketCostInput').value) || 0;
+
+        if (cost <= 0) {
+            alert("সঠিক বাজার খরচ লিখুন!");
+            return;
+        }
+
+        marketCosts.push({ date: date, desc: desc, cost: cost });
+        document.getElementById('marketCostInput').value = '';
+        document.getElementById('marketDesc').value = '';
+        updateUI();
+        showToast("বাজার খরচ সফলভাবে সেভ হয়েছে!");
+    }
+
+    function deleteMarketCost(index) {
+        openModal(() => {
+            marketCosts.splice(index, 1);
+            updateUI();
+            showToast("বাজার খরচ সফলভাবে ডিলিট করা হয়েছে!", true);
+        });
+    }
+
+    function updateUI() {
+        let totalDeposit = 0;
+        let totalMeals = 0;
+        let totalCost = 0;
+        let totalMealCost = 0;
+
+        marketCosts.forEach(m => totalCost += m.cost);
+
+        let depositSelect = document.getElementById('depositBoarderSelect');
+        let mealSelect = document.getElementById('mealBoarderSelect');
+        
+        depositSelect.innerHTML = '<option value="">--বোর্ডার বেছে নিন--</option>';
+        mealSelect.innerHTML = '<option value="">--বোর্ডার বেছে নিন--</option>';
+
+        let tableBody = document.getElementById('boarderTableBody');
+        tableBody.innerHTML = '';
+
+        if (boarders.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" style="color: #777;">কোনো বোর্ডার সেভ করা নেই।</td></tr>`;
+        }
+
+        boarders.forEach((b, index) => {
+            totalDeposit += b.deposit;
+            
+            let bTotalMeals = 0;
+            let bMealCost = 0;
+            b.meals.forEach(m => {
+                bTotalMeals += (m.breakfast + m.lunch + m.dinner);
+                bMealCost += (m.breakfast * 5) + (m.lunch * 15) + (m.dinner * 10);
+            });
+            totalMeals += bTotalMeals;
+            totalMealCost += bMealCost;
+
+            depositSelect.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+            mealSelect.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+
+            tableBody.innerHTML += `<tr>
+                <td><b>${b.name}</b></td>
+                <td>${b.deposit}</td>
+                <td>${bTotalMeals}</td>
+                <td><span class="link-btn" onclick="showDetail(${index})">ফাইল দেখুন</span></td>
+                <td><button class="delete-btn" onclick="deleteBoarder(${index})">ডিলিট</button></td>
+            </tr>`;
+        });
+
+        let marketHistoryBody = document.getElementById('marketHistoryBody');
+        marketHistoryBody.innerHTML = '';
+        if (marketCosts.length === 0) {
+            marketHistoryBody.innerHTML = `<tr><td colspan="4" style="color: #777;">কোনো বাজার খরচ নেই।</td></tr>`;
+        } else {
+            marketCosts.forEach((mc, index) => {
+                marketHistoryBody.innerHTML += `<tr>
+                    <td>${mc.date}</td>
+                    <td>${mc.desc}</td>
+                    <td>${mc.cost} টাকা</td>
+                    <td><button class="delete-btn" onclick="deleteMarketCost(${index})">ডিলিট</button></td>
+                </tr>`;
+            });
+        }
+
+        document.getElementById('totalDeposit').innerText = totalDeposit.toFixed(2);
+        document.getElementById('totalCost').innerText = totalCost.toFixed(2);
+        document.getElementById('totalMeals').innerText = totalMeals;
+        document.getElementById('totalMealCostSummary').innerText = totalMealCost.toFixed(2);
+    }
+
+    function showDetail(index) {
+        let b = boarders[index];
+        let bTotalMeals = 0;
+        let bMealCost = 0;
+
+        b.meals.forEach(m => {
+            bTotalMeals += (m.breakfast + m.lunch + m.dinner);
+            bMealCost += (m.breakfast * 5) + (m.lunch * 15) + (m.dinner * 10);
+        });
+
+        let netBalance = b.deposit - bMealCost;
+
+        document.getElementById('detailTitle').innerText = `${b.name} - এর ব্যক্তিগত হিসাব`;
+        document.getElementById('detailDeposit').innerText = b.deposit.toFixed(2);
+        document.getElementById('detailMeals').innerText = bTotalMeals;
+        document.getElementById('detailMealCost').innerText = bMealCost.toFixed(2);
+
+        let balanceSpan = document.getElementById('detailBalance');
+        balanceSpan.innerText = `${netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)} টাকা`;
+        balanceSpan.style.color = netBalance >= 0 ? 'green' : 'red';
+
+        let mealHistoryBody = document.getElementById('mealHistoryBody');
+        mealHistoryBody.innerHTML = '';
+        if (b.meals.length === 0) {
+            mealHistoryBody.innerHTML = `<tr><td colspan="5" style="color: #777;">কোনো মিল এন্ট্রি করা হয়নি।</td></tr>`;
+        } else {
+            b.meals.forEach(m => {
+                let dayCost = (m.breakfast * 5) + (m.lunch * 15) + (m.dinner * 10);
+                mealHistoryBody.innerHTML += `<tr>
+                    <td>${m.date}</td>
+                    <td>${m.breakfast}</td>
+                    <td>${m.lunch}</td>
+                    <td>${m.dinner}</td>
+                    <td>${dayCost} টাকা</td>
+                </tr>`;
+            });
+        }
+
+        document.getElementById('homePage').classList.add('hidden');
+        document.getElementById('marketPage').classList.add('hidden');
+        document.getElementById('detailPage').classList.remove('hidden');
+    }
+
+    function openMarketPage() {
+        document.getElementById('homePage').classList.add('hidden');
+        document.getElementById('detailPage').classList.add('hidden');
+        document.getElementById('marketPage').classList.remove('hidden');
+    }
+
+    function goHome() {
+        document.getElementById('detailPage').classList.add('hidden');
+        document.getElementById('marketPage').classList.add('hidden');
+        document.getElementById('homePage').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
